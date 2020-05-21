@@ -105,36 +105,6 @@ public class AStar extends Application {
         launch(args);
     }
 
-
-    //Goes through the list of Nodes in our Matrix to setup their H Score.
-    public void setupNodeValues(){
-        //Go through every index in the Grid.
-        for(int y = 0; y < length; y++){
-            for (int x = 0; x < width; x++) {
-                //Make sure we aren't working with a NULL Node.
-                if (graph[x][y] != null){
-                    //Get the Node we want to work with
-                    Node curr = graph[x][y];
-                    //Find it's H Score with this Node and the End node using the Euclidean Method.
-                    curr.setHScore(findHScore(curr,goal));
-                    //If the Node is the start Node, setup the frontier for it.
-                    if (curr.equals(start)){
-                        frontier.clear();
-                        frontier.add(new Path(curr));
-                        visited[x][y] = true;
-                    }
-                }
-            }
-        }
-    }
-
-    //Does the Euclidean Equation on the two Nodes to find what it's H Score is.
-    public double findHScore(Node start, Node end){
-        double xOffset = start.getX() - end.getX();
-        double yOffset = start.getY() - end.getY();
-        return  Math.sqrt(Math.pow(xOffset, 2) + Math.pow(yOffset, 2));
-    }
-
     public void findShortestPath(){
         //Expand frontier
         while (!frontier.isEmpty()){
@@ -168,13 +138,6 @@ public class AStar extends Application {
             //Will potentially add diagonals.
         }
     }
-
-    //Creates a new Path with a Node at the given Coords, and then adds this to the frontier.
-    public void addFrontier(Path p, int x, int y) {
-        frontier.add(new Path(p, graph[x][y]));
-        visited[x][y] = true;
-    }
-
 
     /*
         Finds whether the node with the given Coords would be suitable
@@ -218,6 +181,12 @@ public class AStar extends Application {
 
         //We have made it through all the checks, therefore this node should be added?
         addFrontier(p, x, y);
+    }
+
+    //Creates a new Path with a Node at the given Coords, and then adds this to the frontier.
+    public void addFrontier(Path p, int x, int y) {
+        frontier.add(new Path(p, graph[x][y]));
+        visited[x][y] = true;
     }
 
     //Take the map from the console Argument.
@@ -281,5 +250,34 @@ public class AStar extends Application {
         catch (Exception ex){
             System.err.println("Error: " + ex);
         }
+    }
+
+    //Goes through the list of Nodes in our Matrix to setup their H Score.
+    public void setupNodeValues(){
+        //Go through every index in the Grid.
+        for(int y = 0; y < length; y++){
+            for (int x = 0; x < width; x++) {
+                //Make sure we aren't working with a NULL Node.
+                if (graph[x][y] != null){
+                    //Get the Node we want to work with
+                    Node curr = graph[x][y];
+                    //Find it's H Score with this Node and the End node using the Euclidean Method.
+                    curr.setHScore(findHScore(curr,goal));
+                    //If the Node is the start Node, setup the frontier for it.
+                    if (curr.equals(start)){
+                        frontier.clear();
+                        frontier.add(new Path(curr));
+                        visited[x][y] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    //Does the Euclidean Equation on the two Nodes to find what it's H Score is.
+    public double findHScore(Node start, Node end){
+        double xOffset = start.getX() - end.getX();
+        double yOffset = start.getY() - end.getY();
+        return  Math.sqrt(Math.pow(xOffset, 2) + Math.pow(yOffset, 2));
     }
 }
