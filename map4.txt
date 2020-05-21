@@ -1,0 +1,28 @@
++-------------------------------------------------------+
+|         S                                             |
+|                                   X                   |
+|        X          X                                   |
+|        XX        XX                              X    |
+|        X  X     X X     X                             |
+|        X   X   X  X                       X           |
+|        X    X X   X                                   |
+|        X     X    X              X                    |
+|        X     X    X                                   |
+|        X          X                                   |
+|        X          X                                   |
+|        X          X      XXXXXXX           X          |
+|        X          X     X                             |
+|                        X                 X    X       |
+|                X      X                  X  X         |
+|                       X                        X      |
+|     X                 X                    X X X      |
+|                       X                     X X       |
+|                       X                      X        |
+|         X              X                              |
+|                         X                    X X      |
+|                          XXXXXX              X X      |
+|                                     X X X X X X X X   |
+|  X               X                  X             X   |
+|         X                           X     XGXX        |
+|                                     X     X     X     |
++-------------------------------------------------------+
