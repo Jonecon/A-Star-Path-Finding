@@ -1,8 +1,8 @@
 package sample;
 
 import javafx.application.Application;
+import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.stage.Stage;
@@ -20,6 +20,7 @@ public class AStar extends Application {
     //Parallel Grids
     private Node[][] graph;
     private boolean[][] visited;
+    private boolean[][] pathDraw;
 
     //Frontier and Final Path lists.
     private ArrayList<Path> frontier = new ArrayList<>();
@@ -28,14 +29,24 @@ public class AStar extends Application {
     //Start and End pointers.
     private Node start, goal;
 
+    //Checker
+    private static boolean sizeSpecified = false;
 
     //Used so that we can display the Map to the user, and also the final Path.
     @Override
     public void start(Stage primaryStage) throws Exception{
         //Setup a GridPane so that we can draw all the squares aligned to the Grid we have made to store our Nodes.
-        GridPane root = new GridPane();
+        Group root = new Group();
         //Since out grid is based on the index give it a size to scale it by for displaying.
-        int size = 30;
+        int size = 20;
+
+        if (sizeSpecified)
+            try{
+                size = Integer.parseInt(this.getParameters().getRaw().get(1));
+            }
+            catch (Exception ex){
+                System.err.println("Not a valid size");
+            }
 
         //Parse the map into our program.
         readMap(this.getParameters().getRaw().get(0));
@@ -56,37 +67,32 @@ public class AStar extends Application {
             for (int x = 0; x < width; x++){
                 //Rectangle size, colour, and position setup.
                 Rectangle rect = new Rectangle();
+                rect.setX(x * size);
+                rect.setY(y * size);
                 rect.setWidth(size);
                 rect.setHeight(size);
                 rect.setFill(Color.LIGHTBLUE);
-                GridPane.setRowIndex(rect, y * size);
-                GridPane.setColumnIndex(rect, x * size);
+
 
                 //If this is a NULL Node, set it's colour to a dark blue.
-                if (graph[x][y] == null){
-                    rect.setFill(Color.valueOf("010114"));
-                }
-                //Otherwise do the rest of the checks on the Node.
-                else{
-                    //Go through the Path's list of Nodes.
-                    for (int i = 0; i < path.size(); i++){
-                        //If one of them match Make the rectangle light blue.
-                        if (path.get(i).equals(graph[x][y])) {
-                            rect.setFill(Color.valueOf("0f52ba"));
-                            break;
-                        }
+                    if (graph[x][y] == null){
+                        rect.setFill(Color.valueOf("010114"));
                     }
+                    //Otherwise do the rest of the checks on the Node.
+                    else{
+                        if (pathDraw[x][y])
+                            rect.setFill(Color.valueOf("0f52ba"));
 
-                    //Check to see if the Node is a start Node, if so set it's colour to Light Green.
-                    if (graph[x][y].equals(start))
-                        rect.setFill(Color.LIGHTGREEN);
+                        //Check to see if the Node is a start Node, if so set it's colour to Light Green.
+                        if (graph[x][y].equals(start))
+                            rect.setFill(Color.LIGHTGREEN);
 
-                    //Check to see if the Node is an end Node, if so set it's colour to a Light Red.
-                    if (graph[x][y].equals(goal))
-                        rect.setFill(Color.valueOf("ffc6c4"));
+                        //Check to see if the Node is an end Node, if so set it's colour to a Light Red.
+                        if (graph[x][y].equals(goal))
+                            rect.setFill(Color.valueOf("ffc6c4"));
                 }
                 //Add the rectangle to the grid.
-                root.getChildren().addAll(rect);
+                root.getChildren().add(rect);
             }
         }
         //Setup the scene/display to the width and length of our array, scaled by size.
@@ -96,12 +102,15 @@ public class AStar extends Application {
         primaryStage.show();
     }
 
-
     public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("Usage: java AStar.java <map_file.txt>");
+        if (args.length < 1) {
+            System.err.println("Usage: java AStar.java <map_file.txt> <Int rectangle size (optional)>");
             return;
         }
+
+        if (args.length == 2)
+            sizeSpecified = true;
+
         launch(args);
     }
 
@@ -112,7 +121,6 @@ public class AStar extends Application {
             Collections.sort(frontier);
 
             //Display frontier
-            System.out.println();
             System.out.println("Frontier Size: " + frontier.size());
 
             //Since we sorted our frontier by F Score we just pop the first Frontier Node.
@@ -121,8 +129,12 @@ public class AStar extends Application {
 
             //Check to see if we have found the goal.
             if (expand.getH() == 0){
-                System.out.println("FOUND MATCH: (" + expand.getCurrent().getX() + "," + expand.getCurrent().getY() + ") with an H Score: " + expand.getH());
+                System.out.println("FOUND MATCH: (" + expand.getCurrent().getX() + "," + expand.getCurrent().getY() + ") with an H Score: " + expand.getH() + " and an F Score of: " + expand.getF());
                 path = expand.reCreatePath();
+                for (int i = 0; i < path.size(); i++){
+                    pathDraw[path.get(i).getX()][path.get(i).getY()] = true;
+                    System.out.print("Node: " + i + " Position: (" + path.get(i).getX() + "," + path.get(i).getY() + ") ");
+                }
                 return;
             }
 
@@ -137,6 +149,7 @@ public class AStar extends Application {
             checkNeighbor(expand,x, y - 1);
             //Will potentially add diagonals.
         }
+        System.out.println("No path found.");
     }
 
     /*
@@ -176,9 +189,11 @@ public class AStar extends Application {
                         return;
                     }
                 }
+
+                if (newP.getF() >= frontierComp.getF())
+                    return;
             }
         }
-
         //We have made it through all the checks, therefore this node should be added?
         addFrontier(p, x, y);
     }
@@ -212,6 +227,7 @@ public class AStar extends Application {
             //Setup the Grids's with the values we read from the when we read the map earlier.
             graph = new Node[width][length];
             visited = new boolean[width][length];
+            pathDraw = new boolean[width][length];
 
             //While there is information in this file to read.
             while ((line = bw.readLine()) != null){
@@ -239,6 +255,7 @@ public class AStar extends Application {
                         goal = node;
                     }
                     visited[x][y] = false;
+                    pathDraw[x][y] = false;
                 }
                 y++;
             }
