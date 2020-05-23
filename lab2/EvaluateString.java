@@ -87,7 +87,7 @@ public class EvaluateString {
 				else if (tokens[i] == ')') {
 
 					//Can not be a '.' stright after a ')' or a numerical value
-					if(((i + 1) < tokens.length) && ((tokens[i + 1 ] == '.') || (tokens[i] >= '0' && tokens[i] <= '9'))){
+					if(((i + 1) < tokens.length) && ((tokens[i + 1 ] == '.') || (tokens[i+1] >= '0' && tokens[i+1] <= '9'))){
 						return null;
 					}
 					//Finishing off the expression
@@ -168,21 +168,4 @@ public class EvaluateString {
 	}
 
 	}
-
-	/*public static void main(String[] args) {
-		
-		System.out.println(EvaluateString.evaluate("( 4).4"));
-		System.out.println(EvaluateString.evaluate("9(9 + 2(2 ** 4))"));
-		//System.out.println(EvaluateString.evaluate("(44 / 4) - 44"));
-
-		System.out.println(EvaluateString.evaluate("(4 ** 2  + 2 ) "));
-		System.out.println(EvaluateString.evaluate(" 44 ** 2.2  + 2"));
-		System.out.println(EvaluateString.evaluate("( 3.6 * 6 * 6 ) + 2"));
-		System.out.println(EvaluateString.evaluate("100 * 2 + 12"));
-		System.out.println(EvaluateString.evaluate("100 * ( 2 + 12 )"));
-		System.out.println(EvaluateString.evaluate("100 * ( 2 + 12 ) / 14"));
-	
-	}*/
-
-	
 }
